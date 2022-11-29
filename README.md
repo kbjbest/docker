@@ -107,3 +107,58 @@ docker run -v /path/to/code:/app/code … → Bind Mount
 개발 중일때는 Dockerfile에 COPY를 빼서 사용할 수 있다. bind mount가 자동으로 해주니까
 
 근데 product단계에서는 bind mount를 할리가 없으니 COPY가 필요한 것
+
+# **.dockerignore 파일에 더 추가하기**
+
+`.dockerignore` 파일에 "무시할" 파일 및 폴더를 더 추가할 수 있습니다.
+
+예를 들어, 항목에 다음을 추가하는 것을 고려하세요.
+
+`1. Dockerfile
+2. .git`
+
+이것은 잠재적으로 존재하는 `.git` 폴더와 `Dockerfile` 자체를 무시합니다(프로젝트에 Git을 사용하는 경우).
+
+일반적으로 애플리케이션이 올바르게 실행되는데 필요없는 모든 것을 추가하고자 할 겁니다.
+
+# .dockerignore & .env & arg
+
+.dockerignore : .gitignore와 비슷함(ex. node_modules)
+
+.env : 환경변수 (PORT=8000) docker run -p 3000:8000 —env-file ./.env, Dockerfile에 ENV PORT 8000과 같이 입력
+
+arg : Dockerfile에 ARG DEFAULT_PORT=80이라 입력 후 이미지 만들 때 docker build -t feedback-node:dev --build-arg DEFAULT_PORT=8000 .
+
+# 컨테이너와 호스트머신과의 통신
+
+ex) mongodb://localhost:27017/swfavorites → mongodb://host.docker.internal:27017/swfavorites
+
+# 컨테이너와 컨테이너의 통신
+
+docker network create {networkName}
+
+docker run —network {networkName}
+
+docker run 할때 -p를 안해도 된다. -p를 할때는 컨테이너와 호스트 연결이나 컨테이너와 외부연결할 때 필요함
+
+# **Docker 네트워크 드라이버**
+
+Docker Networks는 실제로 네트워크 동작에 영향을 미치는 다양한 종류의 '**드라이버**'를 지원합니다.
+
+디폴트 드라이버는 '**bridge**' 드라이버입니다. 이 드라이버는 모듈에 나타난 동작을 제공합니다 (즉, 컨테이너가 동일한 네트워크에 있는 경우, 이름으로 서로를 찾을 수 있음).
+
+드라이버는 네트워크 생성 시 '`--driver`' 옵션을 추가하여 간단히 설정할 수 있습니다.
+
+`1. docker network create --driver bridge my-net`
+
+물론 'bridge' 드라이버를 사용하고자 하는 경우, 'bridge'가 디폴트이므로, 전체 옵션을 생략하면 됩니다.
+
+Docker는 아래의 대체 드라이버도 지원하지만 대부분의 경우 'bridge' 드라이버를 사용합니다.
+
+- **host**: 스탠드얼론 컨테이너의 경우, 컨테이너와 호스트 시스템 간의 격리가 제거됩니다 (즉, localhost를 네트워크로 공유함).
+- **overlay**: 여러 Docker 데몬 (즉, 서로 다른 머신에서 실행되는 Docker)이 서로 연결될 수 있습니다. 여러 컨테이너를 연결하는 구식의 / 거의 사용되지 않는 방법인 'Swarm' 모드에서만 작동합니다.
+- **macvlan**: 컨테이너에 커스텀 MAC 주소를 설정할 수 있습니다. 그러면 이 주소를 해당 컨테이너와 통신하는데 사용할 수 있습니다.
+- **none**: 모든 네트워킹이 비활성화됩니다.
+- **써드파티 플러그인**: 모든 종류의 동작과 기능을 추가할 수 있는 타사 플러그인을 설치할 수 있습니다.
+
+언급했듯이 '**bridge**' 드라이버는 대부분의 시나리오에 가장 적합합니다.
