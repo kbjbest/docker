@@ -162,3 +162,65 @@ Docker는 아래의 대체 드라이버도 지원하지만 대부분의 경우 '
 - **써드파티 플러그인**: 모든 종류의 동작과 기능을 추가할 수 있는 타사 플러그인을 설치할 수 있습니다.
 
 언급했듯이 '**bridge**' 드라이버는 대부분의 시나리오에 가장 적합합니다.
+
+# mongodb 사용시 “데이터유지”와 “인증 보안” 관련
+
+docker run --name mongodb -v data:/data/db --rm -d --network goals-net -e MONGO_INITDB_ROOT_USERNAME=max -e MONGO_INITDB_ROOT_PASSWORD=secret mongo
+
+# Windows에서 live source update
+
+nodemon : { “scripts”: “nodemon -L server.js” }
+
+react : docker run -e CHOKIDAR_USEPOLLING=true ...other-options <react-image-id>
+
+# MULTI-01-STARTING-SETUP 프로젝트 가이드
+
+docker run --name mongodb -v data:/data/db --rm -d --network goals-net -e MONGO_INITDB_ROOT_USERNAME=max -e MONGO_INITDB_ROOT_PASSWORD=secret mongo
+
+docker build -t goals-node .
+
+docker run --name goals-backend -v C:\docker\multi-01-starting-setup\backend:/app -v logs:/app/logs -v /app/node_modules -e MONGODB_USERNAME=max -d --rm -p 80:80 --network goals-net goals-node
+
+docker build -t goals-react .
+
+docker run -e CHOKIDAR_USEPOLLING=true -v C:\docker\multi-01-starting-setup\frontend/src:/app/src --name goals-frontend --rm -p 3000:3000 -it goals-react
+
+# **Linux에 Docker Compose 설치하기**
+
+macOS 및 Windows에서는 Docker Compose가 이미 설치되어 있을 겁니다. Docker와 함께 설정되기 때문이죠.
+
+Linux 시스템에서는 별도로 설치해야 합니다.
+
+설치를 위해 다음 단계를 수행하세요.
+
+1. `sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose`
+
+2. `sudo chmod +x /usr/local/bin/docker-compose`
+
+3. `sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose`
+
+4. to verify: `docker-compose --version`
+
+참조: [https://docs.docker.com/compose/install/](https://docs.docker.com/compose/install/)
+
+# Docker Compose
+
+1. docker-compose.yaml과 같이 파일명.yaml 형태로 파일 생성
+2. yam파일안에 내용 구성
+3. docker-compose up, docker-compose down과 같은 형태로 서비스를 올리고 내릴 수 있다.
+4. docker-compose up -d : detach 모드로 서비스 올림
+5. docker-compose down -v : volume도 내림(보통 안씀)
+
+# Utility Container
+
+예를들어 빈프로젝트에서 nodejs의 package.json을 구성해야 하는데 이건 “npm install”로 가능하다. 근데 만약 호스트PC에서 nodejs가 설치가 안되어있다면 package.json을 직접 타이핑하여 구성할 수 밖에 없다. 그러한 문제점을 해결하기 위해 Utility Container를 사용한다.
+
+ex) docker run -it -v C:\docker\utility-container:/app node-util npm init
+
+위와 같이 바운드마운트를 사용하여 호스트PC에 package.json을 생성할 수 있다.
+
+Dockerfile : ENTRYPOINT [ "npm" ]을 사용하면 docker run -it -v C:\docker\utility-container:/app node-util init 처럼 init앞에 npm 제거 가능(그다지 필요 없을 거 같은데?)
+
+종속성 추가 : docker run -it -v C:\docker\utility-container:/app mynpm install express --save(express 설치)
+
+docker compose사용가능하다. (docker-compose run --rm npm init)

@@ -14,7 +14,7 @@ function App() {
       setIsLoading(true);
 
       try {
-        const response = await fetch('http://host.docker.internal/goals');
+        const response = await fetch('http://localhost/goals');
 
         const resData = await response.json();
 
@@ -39,7 +39,7 @@ function App() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://host.docker.internal/goals', {
+      const response = await fetch('http://localhost/goals', {
         method: 'POST',
         body: JSON.stringify({
           text: goalText,
@@ -78,7 +78,7 @@ function App() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://host.docker.internal/goals/' + goalId, {
+      const response = await fetch('http://localhost/goals/' + goalId, {
         method: 'DELETE',
       });
 
